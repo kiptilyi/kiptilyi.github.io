@@ -28,41 +28,13 @@
 		#result {
 			display: block;
 		}
-		#img-result {
-			max-width: 100%;
-			height: auto;
-		}
-		[for=blue] { color: blue; }
-		[for=green] { color: green; }
-		[for=red] { color: red; }
 	</style>
 	<body>
-		<!--<label class="cameraButton">Take a photo-->
-			<!--<input id="input" type="file" accept="image/*;capture=camera">-->
-		<!--</label>-->
-		<!--<span id="result"></span>-->
-		<input id="uploadImage" type="file" name="photo" accept="image/*;capture=camera" />
-		<input id="caption" type="text" name="caption" placeholder="caption" />
-
-		<label for="blue">Blue</label>
-		<input id="color" type="radio" name="color" value="blue" />
-
-		<label for="green">Green</label>
-		<input id="color" type="radio" name="color" value="green" />
-
-		<label for="red">Red</label>
-		<input id="color" type="radio" name="color" value="red" />
-
-		<canvas id="canvas" width="640" height="480" style="border:1px solid #ccc"></canvas>
-
-		<br />
-
-		<h5>Preview</h5>
-		<a href="#" id="imageData" type="text" target="_blank">
-			<img id="preview" style="width:200px; height: 200px;" />
-		</a>
+		<label class="cameraButton">Take a photo
+			<input id="input" type="file" accept="image/*;capture=camera">
+		</label>
+		<span id="result"></span>
 	</body>
-	<script src="script.js"></script>
 	<script>
         const el = document.querySelector('#input');
         el.addEventListener('change', (event) => {
