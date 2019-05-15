@@ -7,6 +7,24 @@
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>Hello!</title>
 	</head>
+	<style>
+		label.cameraButton {
+			display: inline-block;
+			margin: 1em 0;
+			padding: 0.5em;
+			border: 2px solid #666;
+			border-color: #EEE #CCC #CCC #EEE;
+			background-color: #DDD;
+		}
+
+		label.cameraButton:active {
+			border-color: #CCC #EEE #EEE #CCC;
+		}
+
+		label.cameraButton input[accept*="camera"] {
+			display: none;
+		}
+	</style>
 	<body>
 		<label class="cameraButton">Take a photo
 			<input id="input" type="file" accept="image/*;capture=camera">
