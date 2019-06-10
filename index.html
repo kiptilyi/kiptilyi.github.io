@@ -7,39 +7,10 @@
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>Hello!</title>
 	</head>
-	<style>
-		label.cameraButton {
-			display: inline-block;
-			margin: 1em 0;
-			padding: 0.5em;
-			border: 2px solid #666;
-			border-color: #EEE #CCC #CCC #EEE;
-			border-radius: 5px;
-			background-color: #DDD;
-		}
-
-		label.cameraButton:active {
-			border-color: #CCC #EEE #EEE #CCC;
-		}
-
-		label.cameraButton input[accept*="camera"] {
-			display: none;
-		}
-		#result {
-			display: block;
-		}
-	</style>
 	<body>
-		<label class="cameraButton">Take a photo
-			<input id="input" type="file" accept="image/*;capture=camera">
-		</label>
-		<span id="result"></span>
+	<input type="text" autofocus="true">
+	<input type="text" autofocus="true">
+	<input type="text" autofocus="true">
 	</body>
-	<script>
-        const el = document.querySelector('#input');
-        el.addEventListener('change', (event) => {
-            const result = document.querySelector('#result');
-            result.textContent = event.target.value;
-        });
-	</script>
+
 </html>
