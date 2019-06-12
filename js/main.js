@@ -14231,12 +14231,58 @@ var canvasModalWidth;
 var fitImageOn;
 var imgObj = document.getElementById("helpImg");
 
+function fitImageOn(canvas, img) {
+    var imageAspectRatio = img.width / img.height;
+    var canvasAspectRatio = canvas.width() / canvas.height();
+    var renderableHeight, renderableWidth, xStart, yStart;
+
+    if(imageAspectRatio < canvasAspectRatio) {
+        renderableHeight = canvas.height();
+        renderableWidth = img.width * (renderableHeight / img.height);
+        xStart = (canvas.width() - renderableWidth) / 2;
+        yStart = 0;
+    }
+
+    else if(imageAspectRatio > canvasAspectRatio) {
+        renderableWidth = canvas.width()
+        renderableHeight = img.height * (renderableWidth / img.width);
+        xStart = 0;
+        yStart = (canvas.height() - renderableHeight) / 2;
+    }
+
+    else {
+        renderableHeight = canvas.height();
+        renderableWidth = canvas.width();
+        xStart = 0;
+        yStart = 0;
+    }
+
+    // console.log(ctx);
+    // console.log(img);
+    console.log(xStart);
+    console.log(yStart);
+    console.log(renderableWidth);
+    console.log(renderableHeight);
+    ctx.drawImage(img, xStart, yStart, renderableWidth, renderableHeight);
+};
+
+function draw(imgSrc) {
+
+    imgObj.onload = function() {
+        fitImageOn(canvas, imgObj)
+    };
+
+    imgObj.src = imgSrc;
+
+    fitImageOn(canvas, imgObj);
+
+}
+
+
 inputPhoto.on("change", function () {
     canvasModal.modal("show");
     canvasModalHeight = canvasModal.height();
     canvasModalWidth = canvasModal.width();
-
-
 
     canvas.attr("height", canvasModalHeight - 38);
     canvas.attr("width", canvasModalWidth);
@@ -14251,61 +14297,13 @@ inputPhoto.on("change", function () {
         }
     })($(this)[0]);
 
-    function draw(imgSrc) {
-
-
-        imgObj.onload = function() {
-            fitImageOn(canvas, imgObj)
-        };
-
-        imgObj.src = imgSrc;
-
-        fitImageOn = function(canvas, img) {
-            var imageAspectRatio = img.width / img.height;
-            var canvasAspectRatio = canvas.width() / canvas.height();
-            var renderableHeight, renderableWidth, xStart, yStart;
-
-            if(imageAspectRatio < canvasAspectRatio) {
-                renderableHeight = canvas.height();
-                renderableWidth = img.width * (renderableHeight / img.height);
-                xStart = (canvas.width() - renderableWidth) / 2;
-                yStart = 0;
-            }
-
-            else if(imageAspectRatio > canvasAspectRatio) {
-                renderableWidth = canvas.width()
-                renderableHeight = img.height * (renderableWidth / img.width);
-                xStart = 0;
-                yStart = (canvas.height() - renderableHeight) / 2;
-            }
-
-            else {
-                renderableHeight = canvas.height();
-                renderableWidth = canvas.width();
-                xStart = 0;
-                yStart = 0;
-            }
-
-            // console.log(ctx);
-            // console.log(img);
-            console.log(xStart);
-            console.log(yStart);
-            console.log(renderableWidth);
-            console.log(renderableHeight);
-            ctx.drawImage(img, xStart, yStart, renderableWidth, renderableHeight);
-        };
-
-
-
-
-
-    }
-
-
-    // console.log(canvasModalWidth);
-    // console.log(canvasModalHeight);
 });
 
 $(window).resize(function () {
-    alert("Height" + canvasModal.height() + "    Width" + canvasModal.width());
+    canvasModalHeight = canvasModal.height();
+    canvasModalWidth = canvasModal.width();
+
+    canvas.attr("height", canvasModalHeight - 38);
+    canvas.attr("width", canvasModalWidth);
+    fitImageOn(canvas, imgObj);
 });

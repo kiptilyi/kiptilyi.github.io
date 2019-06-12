@@ -3875,7 +3875,7 @@ a.text-dark:hover, a.text-dark:focus {
   min-width: 100%;
   margin: 0; }
   .modal-full .modal-content {
-    min-height: 100vh; }
+    height: 90vh; }
   .modal-full .modal-body {
     display: -ms-flexbox;
     display: flex;
@@ -3886,6 +3886,12 @@ a.text-dark:hover, a.text-dark:focus {
     padding: 0; }
   .modal-full .modal-header {
     padding: 5px 15px; }
+
+.modal {
+  height: 90vh; }
+
+body {
+  height: 90vh; }
 
 #helpImgWrap {
   position: absolute;
