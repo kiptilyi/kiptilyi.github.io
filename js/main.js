@@ -14272,10 +14272,11 @@ function liveDrawing(inputId) {
 
     function drawPhoto(img) {
 
-        changePhotoRotate();
 
         canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
         canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+
+        changePhotoRotate();
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
