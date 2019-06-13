@@ -14284,29 +14284,38 @@ function drawPhoto(img) {
     $(canvas).fadeIn(300);
 }
 
+function setCanvasSize() {
+    modalHeight = canvasModal.querySelector(".modal-body").offsetHeight;
+    modalWidth = canvasModal.querySelector(".modal-body").clientWidth;
+
+    canvas.setAttribute("height", modalHeight);
+    canvas.setAttribute("width", modalWidth);
+}
+
 function resizeIfOrientChange() {
     switch(window.orientation) {
         case -90 || 90:
-            drawPhoto(img);
+            setTimeout(() => {
+                setCanvasSize();
+                drawPhoto(img);
+            }, 100);
             break;
         default:
-            drawPhoto(img);
+            setTimeout(() => {
+                setCanvasSize();
+                drawPhoto(img);
+            }, 100);
             break;
     }
 }
+
+window.addEventListener('orientationchange', resizeIfOrientChange);
 
 inputPhoto.addEventListener("change", function () {
     modalInst.show();
 });
 
 $(canvasModal).on("shown.bs.modal", function (e) {
-    modalHeight = canvasModal.querySelector(".modal-body").offsetHeight;
-    modalWidth = canvasModal.querySelector(".modal-body").offsetWidth;
-
-    canvas.setAttribute("height", modalHeight);
-    canvas.setAttribute("width", modalWidth);
-
+    setCanvasSize();
     uploadPhoto(inputPhoto, createImage, drawPhoto);
 });
-
-window.addEventListener('orientationchange', resizeIfOrientChange);
