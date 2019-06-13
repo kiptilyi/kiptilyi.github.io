@@ -14220,90 +14220,93 @@ return Popper;
 }));
 //# sourceMappingURL=modal.js.map
 
-var canvas = $("#canvas");
-var ctx = canvas[0].getContext("2d");
-var canvasModal = $("#canvasModal");
-var inputPhoto = $("#takePhoto");
-var clickX = new Array();
-var clickY = new Array();
-var canvasModalHeight;
-var canvasModalWidth;
-var fitImageOn;
-var imgObj = document.getElementById("helpImg");
+'use sctrict'
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const canvasModal = document.getElementById("canvasModal");
+const modalInst = new Modal(canvasModal);
+const inputPhoto = document.getElementById("takePhoto");
+const clickX = new Array();
+const clickY = new Array();
+const img = new Image();
+let modalHeight;
+let modalWidth;
 
-function fitImageOn(canvas, img) {
-    var imageAspectRatio = img.width / img.height;
-    var canvasAspectRatio = canvas.width() / canvas.height();
-    var renderableHeight, renderableWidth, xStart, yStart;
+
+function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.readAsDataURL(input.files[0]);
+        reader.onload = (e) => {
+            createImgFunc(e.target.result, drawPhotoFunc);
+        }
+    } else {
+        alert("Что-то пошло не так...");
+    }
+}
+
+function createImage(imgSrc, drawPhotoFunc) {
+    img.src = imgSrc;
+    img.onload = () => {
+        drawPhotoFunc(img);
+    }
+}
+
+function drawPhoto(img) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let imageAspectRatio = img.width / img.height;
+    let canvasAspectRatio = canvas.width / canvas.height;
+    let renderableHeight, renderableWidth, xStart, yStart;
 
     if(imageAspectRatio < canvasAspectRatio) {
-        renderableHeight = canvas.height();
+        renderableHeight = canvas.height;
         renderableWidth = img.width * (renderableHeight / img.height);
-        xStart = (canvas.width() - renderableWidth) / 2;
+        xStart = (canvas.width - renderableWidth) / 2;
         yStart = 0;
     }
 
     else if(imageAspectRatio > canvasAspectRatio) {
-        renderableWidth = canvas.width()
+        renderableWidth = canvas.width;
         renderableHeight = img.height * (renderableWidth / img.width);
         xStart = 0;
-        yStart = (canvas.height() - renderableHeight) / 2;
+        yStart = (canvas.height - renderableHeight) / 2;
     }
 
     else {
-        renderableHeight = canvas.height();
-        renderableWidth = canvas.width();
+        renderableHeight = canvas.height;
+        renderableWidth = canvas.width;
         xStart = 0;
         yStart = 0;
     }
 
-    // console.log(ctx);
-    // console.log(img);
-    console.log(xStart);
-    console.log(yStart);
-    console.log(renderableWidth);
-    console.log(renderableHeight);
     ctx.drawImage(img, xStart, yStart, renderableWidth, renderableHeight);
-};
-
-function draw(imgSrc) {
-
-    imgObj.onload = function() {
-        fitImageOn(canvas, imgObj)
-    };
-
-    imgObj.src = imgSrc;
-
-    fitImageOn(canvas, imgObj);
-
+    $(canvas).fadeIn(300);
 }
 
+function resizeIfOrientChange() {
+    switch(window.orientation) {
+        case -90 || 90:
+            drawPhoto(img);
+            break;
+        default:
+            drawPhoto(img);
+            break;
+    }
+}
 
-inputPhoto.on("change", function () {
-    canvasModal.modal("show");
-    canvasModalHeight = canvasModal.height();
-    canvasModalWidth = canvasModal.width();
-
-    canvas.attr("height", canvasModalHeight - 38);
-    canvas.attr("width", canvasModalWidth);
-
-    (function (input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.readAsDataURL(input.files[0]);
-            reader.onload = function (e) {
-                draw(e.target.result);
-            };
-        }
-    })($(this)[0]);
-
+inputPhoto.addEventListener("change", function () {
+    modalInst.show();
 });
 
-$(window).resize(function () {
-    canvasModalHeight = canvasModal.height();
-    canvasModalWidth = canvasModal.width();
+$(canvasModal).on("shown.bs.modal", function (e) {
+    modalHeight = canvasModal.querySelector(".modal-body").offsetHeight;
+    modalWidth = canvasModal.querySelector(".modal-body").offsetWidth;
 
-    canvas.attr("height", canvasModalHeight - 38);
-    canvas.attr("width", canvasModalWidth);
-    fitImageOn(canvas, imgObj);
+    canvas.setAttribute("height", modalHeight);
+    canvas.setAttribute("width", modalWidth);
+
+    uploadPhoto(inputPhoto, createImage, drawPhoto);
 });
+
+window.addEventListener('orientationchange', resizeIfOrientChange);
