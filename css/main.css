@@ -3896,8 +3896,7 @@ body {
   height: 100%; }
 
 #canvas {
-  display: none;
-  transition: all .3s ease; }
+  display: none; }
 
 #helpImgWrap {
   position: absolute;

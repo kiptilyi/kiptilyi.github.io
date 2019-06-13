@@ -14231,6 +14231,7 @@ const clickY = new Array();
 const img = new Image();
 let modalHeight;
 let modalWidth;
+let portraitOrient = true;
 
 
 function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
@@ -14252,8 +14253,20 @@ function createImage(imgSrc, drawPhotoFunc) {
     }
 }
 
+function changePhotoRotate(orintation, imgH, imgW) {
+    let android = navigator.userAgent.match(/Android/i);
+    if (portraitOrient && imgW > imgH && android) {
+        canvas.style.transform = "rotate(90deg)";
+        let canW = canvas.width;
+        let canH = canvas.height;
+        canvas.setAttribute("height", canW);
+        canvas.setAttribute("width", canH);
+    }
+}
+
 function drawPhoto(img) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    changePhotoRotate(portraitOrient, img.height, img.width);
 
     let imageAspectRatio = img.width / img.height;
     let canvasAspectRatio = canvas.width / canvas.height;
@@ -14312,6 +14325,9 @@ function resizeIfOrientChange() {
 window.addEventListener('orientationchange', resizeIfOrientChange);
 
 inputPhoto.addEventListener("change", function () {
+    if (window.orientation == 90 || window.orientation == -90) {
+        portraitOrient = false;
+    }
     modalInst.show();
 });
 
