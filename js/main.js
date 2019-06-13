@@ -14262,8 +14262,9 @@ function liveDrawing(inputId) {
     function changePhotoRotate(orintation, imgH, imgW) {
         let android = navigator.userAgent.match(/Android/i);
 
-        console.log(android);
-
+alert(android);
+alert(imgW > imgH);
+        alert(portraitOrient);
         if (portraitOrient && imgW > imgH && android) {
 
             canvas.style.transform = "rotate(90deg)";
