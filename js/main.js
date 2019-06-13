@@ -14236,6 +14236,8 @@ function liveDrawing(inputId) {
     const img = new Image();
     let modalHeight;
     let modalWidth;
+    let cutCanvasHeight;
+    let cutCanvasWidth;
     let portraitOrient = true;
 
     function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
@@ -14269,6 +14271,12 @@ function liveDrawing(inputId) {
     }
 
     function drawPhoto(img) {
+
+        changePhotoRotate();
+
+        canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
+        canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         let imageAspectRatio = img.width / img.height;
@@ -14296,29 +14304,19 @@ function liveDrawing(inputId) {
             yStart = 0;
         }
 
+        cutCanvasHeight = renderableHeight;
+        cutCanvasWidth = renderableWidth;
 
-        canvas.setAttribute("height", renderableHeight);
-        canvas.setAttribute("width", renderableWidth);
-
-
-        changePhotoRotate(portraitOrient, renderableHeight, renderableWidth);
+        setCanvasSize();
 
         ctx.drawImage(img, 0, 0, renderableWidth, renderableHeight);
 
-
-        // console.log(xStart);
-        // console.log(yStart);
-        // console.log(renderableWidth);
-        // console.log(renderableHeight);
         $(canvas).fadeIn(300);
     }
 
     function setCanvasSize() {
-        modalHeight = canvasModal.querySelector(".modal-body").offsetHeight;
-        modalWidth = canvasModal.querySelector(".modal-body").clientWidth;
-
-        canvas.setAttribute("height", modalHeight);
-        canvas.setAttribute("width", modalWidth);
+        canvas.setAttribute("height", cutCanvasHeight);
+        canvas.setAttribute("width", cutCanvasWidth);
     }
 
     function resizeIfOrientChange() {
@@ -14348,7 +14346,6 @@ function liveDrawing(inputId) {
     });
 
     $(canvasModal).on("shown.bs.modal", function (e) {
-        setCanvasSize();
         uploadPhoto(inputPhoto, createImage, drawPhoto);
     });
 
