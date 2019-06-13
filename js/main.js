@@ -14273,8 +14273,6 @@ function liveDrawing(inputId) {
 
     function drawPhoto(img) {
 
-
-
         canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
         canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
 
@@ -14322,24 +14320,16 @@ function liveDrawing(inputId) {
         canvas.setAttribute("width", cutCanvasWidth);
     }
 
-    function resizeIfOrientChange() {
-        switch (window.orientation) {
-            case -90 || 90:
-                setTimeout(() => {
-                    setCanvasSize();
-                    drawPhoto(img);
-                }, 100);
-                break;
-            default:
-                setTimeout(() => {
-                    setCanvasSize();
-                    drawPhoto(img);
-                }, 100);
-                break;
-        }
-    }
-
-    window.addEventListener('orientationchange', resizeIfOrientChange);
+    window.addEventListener('orientationchange', () => {
+        let timer;
+        window.onresize = (e) => {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                setCanvasSize();
+                drawPhoto(img);
+            }, 50);
+        };
+    });
 
     inputPhoto.addEventListener("change", function () {
         if (window.orientation == 90 || window.orientation == -90) {
@@ -14352,7 +14342,6 @@ function liveDrawing(inputId) {
         uploadPhoto(inputPhoto, createImage, drawPhoto);
     });
 
-
     canvas.addEventListener("mousedown", function(e){
         let mouseX = e.pageX - this.offsetLeft;
         let mouseY = e.pageY - this.offsetTop;
@@ -14364,6 +14353,7 @@ function liveDrawing(inputId) {
         // addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
         // redraw();
     });
+
 }
 
 liveDrawing("takePhoto");
