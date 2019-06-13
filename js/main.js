@@ -14274,10 +14274,11 @@ function liveDrawing(inputId) {
     function drawPhoto(img) {
 
 
+
         canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
         canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
 
-        changePhotoRotate();
+        changePhotoRotate(portraitOrient, img.height, img.width);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -14322,7 +14323,6 @@ function liveDrawing(inputId) {
     }
 
     function resizeIfOrientChange() {
-        alert(window.orientation);
         switch (window.orientation) {
             case -90 || 90:
                 setTimeout(() => {
