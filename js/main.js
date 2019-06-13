@@ -14220,118 +14220,150 @@ return Popper;
 }));
 //# sourceMappingURL=modal.js.map
 
-'use sctrict'
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const canvasModal = document.getElementById("canvasModal");
-const modalInst = new Modal(canvasModal);
-const inputPhoto = document.getElementById("takePhoto");
-const clickX = new Array();
-const clickY = new Array();
-const img = new Image();
-let modalHeight;
-let modalWidth;
-let portraitOrient = true;
+function liveDrawing(inputId) {
+    'use sctrict'
+    // const modal = `<div class="modal fade" id="drawing-app" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"><div class="modal-dialog modal-full" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><canvas id="da-canvas"></canvas></div></div></div></div>`;
+    // document.body.insertAdjacentHTML("beforeend", modal);
+    const canvas = document.getElementById("da-canvas");
+    const ctx = canvas.getContext("2d");
+    const canvasModal = document.getElementById("drawing-app");
+    const modalInst = new Modal(canvasModal);
+    const inputPhoto = document.getElementById(inputId);
+    inputPhoto.setAttribute("accept","image/*;capture=camera");
+    inputPhoto.setAttribute("type","file");
+    const clickX = new Array();
+    const clickY = new Array();
+    const img = new Image();
+    let modalHeight;
+    let modalWidth;
+    let portraitOrient = true;
 
-
-function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
-    if (input.files && input.files[0]) {
-        let reader = new FileReader();
-        reader.readAsDataURL(input.files[0]);
-        reader.onload = (e) => {
-            createImgFunc(e.target.result, drawPhotoFunc);
+    function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.readAsDataURL(input.files[0]);
+            reader.onload = (e) => {
+                createImgFunc(e.target.result, drawPhotoFunc);
+            }
+        } else {
+            alert("Что-то пошло не так...");
         }
-    } else {
-        alert("Что-то пошло не так...");
     }
+
+    function createImage(imgSrc, drawPhotoFunc) {
+        img.src = imgSrc;
+        img.onload = () => {
+            drawPhotoFunc(img);
+        }
+    }
+
+    function changePhotoRotate(orintation, imgH, imgW) {
+        let android = navigator.userAgent.match(/Android/i);
+        if (portraitOrient && imgW > imgH && android) {
+            canvas.style.transform = "rotate(90deg)";
+            let canW = canvas.width;
+            let canH = canvas.height;
+            canvas.setAttribute("height", canW);
+            canvas.setAttribute("width", canH);
+        }
+    }
+
+    function drawPhoto(img) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let imageAspectRatio = img.width / img.height;
+        let canvasAspectRatio = canvas.width / canvas.height;
+        let renderableHeight, renderableWidth, xStart, yStart;
+
+        if (imageAspectRatio < canvasAspectRatio) {
+            renderableHeight = canvas.height;
+            renderableWidth = img.width * (renderableHeight / img.height);
+            xStart = (canvas.width - renderableWidth) / 2;
+            yStart = 0;
+        }
+
+        else if (imageAspectRatio > canvasAspectRatio) {
+            renderableWidth = canvas.width;
+            renderableHeight = img.height * (renderableWidth / img.width);
+            xStart = 0;
+            yStart = (canvas.height - renderableHeight) / 2;
+        }
+
+        else {
+            renderableHeight = canvas.height;
+            renderableWidth = canvas.width;
+            xStart = 0;
+            yStart = 0;
+        }
+
+
+        canvas.setAttribute("height", renderableHeight);
+        canvas.setAttribute("width", renderableWidth);
+
+
+        changePhotoRotate(portraitOrient, renderableHeight, renderableWidth);
+
+        ctx.drawImage(img, 0, 0, renderableWidth, renderableHeight);
+
+
+        // console.log(xStart);
+        // console.log(yStart);
+        // console.log(renderableWidth);
+        // console.log(renderableHeight);
+        $(canvas).fadeIn(300);
+    }
+
+    function setCanvasSize() {
+        modalHeight = canvasModal.querySelector(".modal-body").offsetHeight;
+        modalWidth = canvasModal.querySelector(".modal-body").clientWidth;
+
+        canvas.setAttribute("height", modalHeight);
+        canvas.setAttribute("width", modalWidth);
+    }
+
+    function resizeIfOrientChange() {
+        switch (window.orientation) {
+            case -90 || 90:
+                setTimeout(() => {
+                    setCanvasSize();
+                    drawPhoto(img);
+                }, 100);
+                break;
+            default:
+                setTimeout(() => {
+                    setCanvasSize();
+                    drawPhoto(img);
+                }, 100);
+                break;
+        }
+    }
+
+    window.addEventListener('orientationchange', resizeIfOrientChange);
+
+    inputPhoto.addEventListener("change", function () {
+        if (window.orientation == 90 || window.orientation == -90) {
+            portraitOrient = false;
+        }
+        modalInst.show();
+    });
+
+    $(canvasModal).on("shown.bs.modal", function (e) {
+        setCanvasSize();
+        uploadPhoto(inputPhoto, createImage, drawPhoto);
+    });
+
+
+    canvas.addEventListener("mousedown", function(e){
+        let mouseX = e.pageX - this.offsetLeft;
+        let mouseY = e.pageY - this.offsetTop;
+
+        console.log(mouseX);
+        console.log(mouseY);
+
+        // paint = true;
+        // addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+        // redraw();
+    });
 }
 
-function createImage(imgSrc, drawPhotoFunc) {
-    img.src = imgSrc;
-    img.onload = () => {
-        drawPhotoFunc(img);
-    }
-}
-
-function changePhotoRotate(orintation, imgH, imgW) {
-    let android = navigator.userAgent.match(/Android/i);
-    if (portraitOrient && imgW > imgH && android) {
-        canvas.style.transform = "rotate(90deg)";
-        let canW = canvas.width;
-        let canH = canvas.height;
-        canvas.setAttribute("height", canW);
-        canvas.setAttribute("width", canH);
-    }
-}
-
-function drawPhoto(img) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    changePhotoRotate(portraitOrient, img.height, img.width);
-
-    let imageAspectRatio = img.width / img.height;
-    let canvasAspectRatio = canvas.width / canvas.height;
-    let renderableHeight, renderableWidth, xStart, yStart;
-
-    if(imageAspectRatio < canvasAspectRatio) {
-        renderableHeight = canvas.height;
-        renderableWidth = img.width * (renderableHeight / img.height);
-        xStart = (canvas.width - renderableWidth) / 2;
-        yStart = 0;
-    }
-
-    else if(imageAspectRatio > canvasAspectRatio) {
-        renderableWidth = canvas.width;
-        renderableHeight = img.height * (renderableWidth / img.width);
-        xStart = 0;
-        yStart = (canvas.height - renderableHeight) / 2;
-    }
-
-    else {
-        renderableHeight = canvas.height;
-        renderableWidth = canvas.width;
-        xStart = 0;
-        yStart = 0;
-    }
-
-    ctx.drawImage(img, xStart, yStart, renderableWidth, renderableHeight);
-    $(canvas).fadeIn(300);
-}
-
-function setCanvasSize() {
-    modalHeight = canvasModal.querySelector(".modal-body").offsetHeight;
-    modalWidth = canvasModal.querySelector(".modal-body").clientWidth;
-
-    canvas.setAttribute("height", modalHeight);
-    canvas.setAttribute("width", modalWidth);
-}
-
-function resizeIfOrientChange() {
-    switch(window.orientation) {
-        case -90 || 90:
-            setTimeout(() => {
-                setCanvasSize();
-                drawPhoto(img);
-            }, 100);
-            break;
-        default:
-            setTimeout(() => {
-                setCanvasSize();
-                drawPhoto(img);
-            }, 100);
-            break;
-    }
-}
-
-window.addEventListener('orientationchange', resizeIfOrientChange);
-
-inputPhoto.addEventListener("change", function () {
-    if (window.orientation == 90 || window.orientation == -90) {
-        portraitOrient = false;
-    }
-    modalInst.show();
-});
-
-$(canvasModal).on("shown.bs.modal", function (e) {
-    setCanvasSize();
-    uploadPhoto(inputPhoto, createImage, drawPhoto);
-});
+liveDrawing("takePhoto");
