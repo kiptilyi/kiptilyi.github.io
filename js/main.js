@@ -15297,14 +15297,9 @@ function liveDrawing(inputId) {
     let modalWidth;
     let cutCanvasHeight;
     let cutCanvasWidth;
-    let landscapeOrient;
 
     function uploadPhoto() {
         if (inputPhoto.files && inputPhoto.files[0]) {
-            EXIF.getData(inputPhoto.files[0], function () {
-                alert(EXIF.getTag(this, "Orientation"));
-                alert(EXIF.getTag(this, "orientation"));
-            });
             let reader = new FileReader();
             reader.readAsDataURL(inputPhoto.files[0]);
             reader.onload = function (e) {
@@ -15319,6 +15314,12 @@ function liveDrawing(inputId) {
         }
     }
 
+    function checkPhotoOrientation() {
+        EXIF.getData(inputPhoto.files[0], function () {
+            return EXIF.getTag(this, "Orientation");
+        });
+    }
+
     function createImage(imgSrc) {
         img.src = imgSrc;
         img.onload = () => {
@@ -15331,22 +15332,22 @@ function liveDrawing(inputId) {
         }
     }
 
-//     function changePhotoRotate(orintation, imgH, imgW) {
-//         let android = navigator.userAgent.match(/Android/i);
-//
-// // alert(android);
-// // alert(imgW > imgH);
-// //         alert(portraitOrient);
-//         console.log(window.orientation);
-//         if (landscapeOrient && imgW > imgH && android) {
-//
-//             canvas.style.transform = "rotate(90deg)";
-//             let canW = canvas.width;
-//             let canH = canvas.height;
-//             canvas.setAttribute("height", canW);
-//             canvas.setAttribute("width", canH);
-//         }
-//     }
+    function changePhotoRotate(orintation, imgH, imgW) {
+        let android = navigator.userAgent.match(/Android/i);
+
+// alert(android);
+// alert(imgW > imgH);
+//         alert(portraitOrient);
+        console.log(window.orientation);
+        if (landscapeOrient && imgW > imgH && android) {
+
+            canvas.style.transform = "rotate(90deg)";
+            let canW = canvas.width;
+            let canH = canvas.height;
+            canvas.setAttribute("height", canW);
+            canvas.setAttribute("width", canH);
+        }
+    }
 
     function drawPhoto(img) {
 
@@ -15391,6 +15392,8 @@ function liveDrawing(inputId) {
 
         $(canvas).fadeIn(300);
 
+
+        document.getElementById("downloadlink").setAttribute("href", canvas.toDataURL("image/jpeg"));
         console.log("3: Img drawn!");
     }
 
