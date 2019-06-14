@@ -15302,7 +15302,8 @@ function liveDrawing(inputId) {
     function uploadPhoto() {
         if (inputPhoto.files && inputPhoto.files[0]) {
             EXIF.getData(inputPhoto.files[0], function () {
-                alert(EXIF.pretty(this));
+                alert(EXIF.getTag(this, "Orientation"));
+                alert(EXIF.getTag(this, "orientation"));
             });
             let reader = new FileReader();
             reader.readAsDataURL(inputPhoto.files[0]);
