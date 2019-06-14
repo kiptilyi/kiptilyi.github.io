@@ -14326,9 +14326,10 @@ function liveDrawing(inputId) {
     }
 
     window.addEventListener('orientationchange', () => {
-        if (window.orientation == 90 || window.orientation == -90) {
-            portraitOrient = false;
-        }
+
+        if (window.orientation == 90 || window.orientation == -90) portraitOrient = false;
+            else portraitOrient = true;
+
         let timer;
         window.onresize = (e) => {
             clearTimeout(timer);
