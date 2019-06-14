@@ -14238,7 +14238,7 @@ function liveDrawing(inputId) {
     let modalWidth;
     let cutCanvasHeight;
     let cutCanvasWidth;
-    let landscapeOrient = false;
+    let landscapeOrient;
 
     function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
         if (input.files && input.files[0]) {
@@ -14325,22 +14325,24 @@ function liveDrawing(inputId) {
         canvas.setAttribute("width", cutCanvasWidth);
     }
 
-    window.addEventListener('orientationchange', () => {
+    function isPortraitOrint() {
+        const w = window.offsetWidth;
+        const h = window.offsetHeight;
+        if (h > w) return true;
+            else if (h < w) return false;
+    }
 
-        if (window.orientation == 90 || window.orientation == -90) landscapeOrient = true;
-            else landscapeOrient = false;
-
-        let timer;
-        window.onresize = (e) => {
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                setCanvasSize();
-                drawPhoto(img);
-            }, 50);
-        };
-    });
+    let timer;
+    window.onresize = (e) => {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            setCanvasSize();
+            drawPhoto(img);
+        }, 50);
+    };
 
     inputPhoto.addEventListener("change", function () {
+        if (isPortraitOrint())
         modalInst.show();
     });
 
