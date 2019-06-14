@@ -15324,30 +15324,47 @@ function liveDrawing(inputId) {
         img.src = imgSrc;
         img.onload = () => {
             console.log("2: Created img!");
-            // img.style.
-            // canvasModal.querySelector(".modal-body").appendChild(img);
-
-            drawPhoto(img);
+            let imgCanvas = document.createElement('canvas');
+            let imgCanvasCtx = imgCanvas.getContext("2d");
+            if (4 < checkPhotoOrientation() && checkPhotoOrientation() < 9) {
+                imgCanvas.width = img.height;
+                imgCanvas.height = img.width;
+            } else {
+                imgCanvas.width = img.width;
+                imgCanvas.height = img.height;
+            }
+            switch (checkPhotoOrientation()) {
+                case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
+                case 3: ctx.transform(-1, 0, 0, -1, width, height ); break;
+                case 4: ctx.transform(1, 0, 0, -1, 0, height ); break;
+                case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+                case 6: ctx.transform(0, 1, -1, 0, height , 0); break;
+                case 7: ctx.transform(0, -1, -1, 0, height , width); break;
+                case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
+                default: break;
+            }
+            imgCanvasCtx.drawImage(img, 0, 0)
+            drawPhoto(imgCanvas);
 
         }
     }
 
-    function changePhotoRotate(orintation, imgH, imgW) {
-        let android = navigator.userAgent.match(/Android/i);
-
-// alert(android);
-// alert(imgW > imgH);
-//         alert(portraitOrient);
-        console.log(window.orientation);
-        if (landscapeOrient && imgW > imgH && android) {
-
-            canvas.style.transform = "rotate(90deg)";
-            let canW = canvas.width;
-            let canH = canvas.height;
-            canvas.setAttribute("height", canW);
-            canvas.setAttribute("width", canH);
-        }
-    }
+//     // function changePhotoRotate(orintation, imgH, imgW) {
+//     //     let android = navigator.userAgent.match(/Android/i);
+//
+// // alert(android);
+// // alert(imgW > imgH);
+// //         alert(portraitOrient);
+//         console.log(window.orientation);
+//         if (landscapeOrient && imgW > imgH && android) {
+//
+//             canvas.style.transform = "rotate(90deg)";
+//             let canW = canvas.width;
+//             let canH = canvas.height;
+//             canvas.setAttribute("height", canW);
+//             canvas.setAttribute("width", canH);
+//         }
+//     }
 
     function drawPhoto(img) {
 
