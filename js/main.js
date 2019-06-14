@@ -15290,25 +15290,26 @@ function liveDrawing(inputId) {
     const inputPhoto = document.getElementById(inputId);
     inputPhoto.setAttribute("accept","image/*;capture=camera");
     inputPhoto.setAttribute("type","file");
-    const clickX = new Array();
-    const clickY = new Array();
-    const img = new Image();
-    let modalHeight;
-    let modalWidth;
-    let cutCanvasHeight;
-    let cutCanvasWidth;
+    let clickX = new Array();
+    let clickY = new Array();
+    const clickDrag = new Array();
+    let paint;
+    let img;
+    // let modalHeight;
+    // let modalWidth;
+    // let cutCanvasHeight;
+    // let cutCanvasWidth;
+    let timer;
+    let ratio;
 
     function uploadPhoto() {
         if (inputPhoto.files && inputPhoto.files[0]) {
             let reader = new FileReader();
             reader.readAsDataURL(inputPhoto.files[0]);
             reader.onload = function (e) {
-
                 console.log("1: Uploaded!");
                 createImage(e.target.result);
             }
-
-
         } else {
             alert("Что-то пошло не так...");
         }
@@ -15321,59 +15322,58 @@ function liveDrawing(inputId) {
     }
 
     function createImage(imgSrc) {
+        img = new Image();
         img.src = imgSrc;
         img.onload = () => {
             console.log("2: Created img!");
-            let imgCanvas = document.createElement('canvas');
-            let imgCanvasCtx = imgCanvas.getContext("2d");
-            if (4 < checkPhotoOrientation() && checkPhotoOrientation() < 9) {
-                imgCanvas.width = img.height;
-                imgCanvas.height = img.width;
-            } else {
-                imgCanvas.width = img.width;
-                imgCanvas.height = img.height;
-            }
-            switch (checkPhotoOrientation()) {
-                case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
-                case 3: ctx.transform(-1, 0, 0, -1, width, height ); break;
-                case 4: ctx.transform(1, 0, 0, -1, 0, height ); break;
-                case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
-                case 6: ctx.transform(0, 1, -1, 0, height , 0); break;
-                case 7: ctx.transform(0, -1, -1, 0, height , width); break;
-                case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
-                default: break;
-            }
-            imgCanvasCtx.drawImage(img, 0, 0)
-            drawPhoto(imgCanvas);
-
+            drawPhoto(img);
         }
     }
 
-//     // function changePhotoRotate(orintation, imgH, imgW) {
-//     //     let android = navigator.userAgent.match(/Android/i);
-//
-// // alert(android);
-// // alert(imgW > imgH);
-// //         alert(portraitOrient);
-//         console.log(window.orientation);
-//         if (landscapeOrient && imgW > imgH && android) {
-//
-//             canvas.style.transform = "rotate(90deg)";
-//             let canW = canvas.width;
-//             let canH = canvas.height;
-//             canvas.setAttribute("height", canW);
-//             canvas.setAttribute("width", canH);
-//         }
-//     }
+    function changePhotoRotate(orintation) {
+
+        if (orintation == 6) {
+
+            canvas.style.transform = "rotate(90deg)";
+            let canW = canvas.width;
+            let canH = canvas.height;
+            canvas.setAttribute("height", canW);
+            canvas.setAttribute("width", canH);
+        }
+    }
 
     function drawPhoto(img) {
 
         canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
         canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
 
-        // changePhotoRotate(portraitOrient, img.height, img.width);
+        changePhotoRotate(checkPhotoOrientation());
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let [renderableHeight, renderableWidth] = setCanvasSize();
+
+        ctx.drawImage(img, 0, 0, renderableWidth, renderableHeight);
+
+
+
+        document.getElementById("downloadlink").setAttribute("href", canvas.toDataURL("image/jpeg"));
+
+        img.width = renderableWidth;
+        img.height = renderableHeight;
+
+        ratio = 0;
+
+        console.log("3: Img drawn!");
+    }
+
+    function setCanvasSize() {
+
+        let oldCanvasH = canvas.height;
+        let oldCanvasW = canvas.width;
+
+
+        canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
+        canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+
 
         let imageAspectRatio = img.width / img.height;
         let canvasAspectRatio = canvas.width / canvas.height;
@@ -15399,44 +15399,42 @@ function liveDrawing(inputId) {
             xStart = 0;
             yStart = 0;
         }
+        canvas.setAttribute("height", renderableHeight);
+        canvas.setAttribute("width", renderableWidth);
 
-        cutCanvasHeight = renderableHeight;
-        cutCanvasWidth = renderableWidth;
-
-        setCanvasSize();
-
-        ctx.drawImage(img, 0, 0, renderableWidth, renderableHeight);
-
-        $(canvas).fadeIn(300);
+        // ratio = (oldCanvasH * oldCanvasW) / (renderableHeight * renderableWidth);
 
 
-        document.getElementById("downloadlink").setAttribute("href", canvas.toDataURL("image/jpeg"));
-        console.log("3: Img drawn!");
+        if (clickX.length && clickY.length) {
+            clickX = clickX.map((el) => (el * renderableWidth) / oldCanvasW);
+            clickY = clickY.map((el) => (el * renderableHeight) / oldCanvasH);
+        }
+
+
+        return [renderableHeight, renderableWidth];
     }
 
-    function setCanvasSize() {
-        canvas.setAttribute("height", cutCanvasHeight);
-        canvas.setAttribute("width", cutCanvasWidth);
-    }
+    // function isPortraitOrint() {
+    //     const w = window.offsetWidth;
+    //     const h = window.offsetHeight;
+    //     if (h > w) return true;
+    //         else if (h < w) return false;
+    // }
 
-    function isPortraitOrint() {
-        const w = window.offsetWidth;
-        const h = window.offsetHeight;
-        if (h > w) return true;
-            else if (h < w) return false;
-    }
-
-    let timer;
     window.onresize = (e) => {
         clearTimeout(timer);
         timer = setTimeout(function () {
             setCanvasSize();
-            drawPhoto(img);
+            // canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
+            // canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+            redraw();
         }, 50);
     };
 
     inputPhoto.addEventListener("change", function () {
-        // if (isPortraitOrint())
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        clickY.length = 0;
+        clickX.length = 0;
         modalInst.show();
     });
 
@@ -15444,18 +15442,64 @@ function liveDrawing(inputId) {
         uploadPhoto();
     });
 
-    canvas.addEventListener("mousedown", function(e){
-        let mouseX = e.pageX - this.offsetLeft;
-        let mouseY = e.pageY - this.offsetTop;
+    canvas.addEventListener("touchstart", function(e){
+        let mouseX = e.touches[0].pageX - this.offsetLeft;
+        let mouseY = e.touches[0].pageY - this.offsetTop;
 
-        console.log(mouseX);
-        console.log(mouseY);
+        // console.log(e);
+        // console.log(mouseY);
+        // console.log(mouseY);
 
-        // paint = true;
-        // addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-        // redraw();
+        paint = true;
+        addClick(e.touches[0].pageX - this.offsetLeft, e.touches[0].pageY - this.offsetTop);
+        redraw();
     });
 
+    canvas.addEventListener("touchmove", function(e){
+        if(paint){
+            addClick(e.touches[0].pageX - this.offsetLeft, e.touches[0].pageY - this.offsetTop, true);
+            redraw();
+        }
+    });
+
+    canvas.addEventListener("touchend", function(e){
+        paint = false;
+    });
+
+    canvas.addEventListener("touchleave", function(e){
+        paint = false;
+    });
+
+    function addClick(x, y, dragging)
+    {
+        clickX.push(x);
+        clickY.push(y);
+        clickDrag.push(dragging);
+    }
+
+    function redraw(){
+        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height); // Clears the canvas
+
+
+        ctx.strokeStyle = "#df4b26";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 5;
+
+        for(var i=0; i < clickX.length; i++) {
+            ctx.beginPath();
+            if(clickDrag[i] && i){
+                ctx.moveTo(clickX[i-1], clickY[i-1]);
+            }else{
+                ctx.moveTo(clickX[i]-1, clickY[i]);
+            }
+            ctx.lineTo(clickX[i], clickY[i]);
+            // console.log(`X:${clickX[i]}   Y:${clickY[i]}`);
+            ctx.closePath();
+            ctx.stroke();
+        }
+        console.log(clickX);
+        console.log(clickY);
+    }
 }
 
 liveDrawing("takePhoto");
