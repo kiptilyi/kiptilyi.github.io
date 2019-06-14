@@ -14238,7 +14238,7 @@ function liveDrawing(inputId) {
     let modalWidth;
     let cutCanvasHeight;
     let cutCanvasWidth;
-    let portraitOrient = true;
+    let landscapeOrient = false;
 
     function uploadPhoto(input, createImgFunc, drawPhotoFunc) {
         if (input.files && input.files[0]) {
@@ -14266,7 +14266,7 @@ function liveDrawing(inputId) {
 // alert(imgW > imgH);
 //         alert(portraitOrient);
         console.log(window.orientation);
-        if (portraitOrient && imgW > imgH && android) {
+        if (landscapeOrient && imgW > imgH && android) {
 
             canvas.style.transform = "rotate(90deg)";
             let canW = canvas.width;
@@ -14327,8 +14327,8 @@ function liveDrawing(inputId) {
 
     window.addEventListener('orientationchange', () => {
 
-        if (window.orientation == 90 || window.orientation == -90) portraitOrient = false;
-            else portraitOrient = true;
+        if (window.orientation == 90 || window.orientation == -90) landscapeOrient = true;
+            else landscapeOrient = false;
 
         let timer;
         window.onresize = (e) => {
