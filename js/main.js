@@ -15286,39 +15286,30 @@ function liveDrawing(inputId) {
     const canvas = document.getElementById("da-canvas");
     const ctx = canvas.getContext("2d");
     const canvasModal = document.getElementById("drawing-app");
+    const canvasModalBody = canvasModal.querySelector(".modal-body");
     const modalInst = new Modal(canvasModal);
     const inputPhoto = document.getElementById(inputId);
-    inputPhoto.setAttribute("accept","image/*;capture=camera");
-    inputPhoto.setAttribute("type","file");
+    const clickDrag = new Array();
     let clickX = new Array();
     let clickY = new Array();
-    const clickDrag = new Array();
     let paint;
     let img;
-    // let modalHeight;
-    // let modalWidth;
-    // let cutCanvasHeight;
-    // let cutCanvasWidth;
     let timer;
     let ratio;
+
+    inputPhoto.setAttribute("accept","image/*;capture=camera");
+    inputPhoto.setAttribute("type","file");
 
     function uploadPhoto() {
         if (inputPhoto.files && inputPhoto.files[0]) {
             let reader = new FileReader();
             reader.readAsDataURL(inputPhoto.files[0]);
             reader.onload = function (e) {
-                console.log("1: Uploaded!");
                 createImage(e.target.result);
             }
         } else {
             alert("Что-то пошло не так...");
         }
-    }
-
-    function checkPhotoOrientation() {
-        EXIF.getData(inputPhoto.files[0], function () {
-            return EXIF.getTag(this, "Orientation");
-        });
     }
 
     function createImage(imgSrc) {
@@ -15330,32 +15321,16 @@ function liveDrawing(inputId) {
         }
     }
 
-    function changePhotoRotate(orintation) {
-
-        if (orintation == 6) {
-
-            canvas.style.transform = "rotate(90deg)";
-            let canW = canvas.width;
-            let canH = canvas.height;
-            canvas.setAttribute("height", canW);
-            canvas.setAttribute("width", canH);
-        }
-    }
-
     function drawPhoto(img) {
 
-        canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
-        canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+        canvas.setAttribute("height", canvasModalBody.offsetHeight);
+        canvas.setAttribute("width", canvasModalBody.offsetWidth);
 
         changePhotoRotate(checkPhotoOrientation());
 
         let [renderableHeight, renderableWidth] = setCanvasSize();
 
         ctx.drawImage(img, 0, 0, renderableWidth, renderableHeight);
-
-
-
-        document.getElementById("downloadlink").setAttribute("href", canvas.toDataURL("image/jpeg"));
 
         img.width = renderableWidth;
         img.height = renderableHeight;
@@ -15365,14 +15340,37 @@ function liveDrawing(inputId) {
         console.log("3: Img drawn!");
     }
 
+    function checkPhotoOrientation() {
+        EXIF.getData(inputPhoto.files[0], function () {
+            return EXIF.getTag(this, "Orientation");
+        });
+    }
+
+    
+
+    function changePhotoRotate(orintation) {
+
+        if (orintation == 6) {
+
+            alert(orintation);
+            canvas.style.transform = "rotate(90deg)";
+            let canW = canvas.width;
+            let canH = canvas.height;
+            canvas.setAttribute("height", canW);
+            canvas.setAttribute("width", canH);
+        }
+    }
+
+    
+
     function setCanvasSize() {
 
         let oldCanvasH = canvas.height;
         let oldCanvasW = canvas.width;
 
 
-        canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
-        canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+        canvas.setAttribute("height", canvasModalBody.offsetHeight);
+        canvas.setAttribute("width", canvasModalBody.offsetWidth);
 
 
         let imageAspectRatio = img.width / img.height;
@@ -15402,8 +15400,6 @@ function liveDrawing(inputId) {
         canvas.setAttribute("height", renderableHeight);
         canvas.setAttribute("width", renderableWidth);
 
-        // ratio = (oldCanvasH * oldCanvasW) / (renderableHeight * renderableWidth);
-
 
         if (clickX.length && clickY.length) {
             clickX = clickX.map((el) => (el * renderableWidth) / oldCanvasW);
@@ -15414,19 +15410,12 @@ function liveDrawing(inputId) {
         return [renderableHeight, renderableWidth];
     }
 
-    // function isPortraitOrint() {
-    //     const w = window.offsetWidth;
-    //     const h = window.offsetHeight;
-    //     if (h > w) return true;
-    //         else if (h < w) return false;
-    // }
-
     window.onresize = (e) => {
         clearTimeout(timer);
         timer = setTimeout(function () {
             setCanvasSize();
-            // canvas.setAttribute("height", canvasModal.querySelector(".modal-body").offsetHeight);
-            // canvas.setAttribute("width", canvasModal.querySelector(".modal-body").offsetWidth);
+            // canvas.setAttribute("height", canvasModalBody.offsetHeight);
+            // canvas.setAttribute("width", canvasModalBody.offsetWidth);
             redraw();
         }, 50);
     };
@@ -15499,6 +15488,7 @@ function liveDrawing(inputId) {
         }
         console.log(clickX);
         console.log(clickY);
+        document.getElementById("downloadlink").setAttribute("href", canvas.toDataURL("image/jpeg"));
     }
 }
 
