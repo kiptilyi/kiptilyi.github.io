@@ -14262,9 +14262,10 @@ function liveDrawing(inputId) {
     function changePhotoRotate(orintation, imgH, imgW) {
         let android = navigator.userAgent.match(/Android/i);
 
-alert(android);
-alert(imgW > imgH);
-        alert(portraitOrient);
+// alert(android);
+// alert(imgW > imgH);
+//         alert(portraitOrient);
+        console.log(window.orientation);
         if (portraitOrient && imgW > imgH && android) {
 
             canvas.style.transform = "rotate(90deg)";
@@ -14325,6 +14326,9 @@ alert(imgW > imgH);
     }
 
     window.addEventListener('orientationchange', () => {
+        if (window.orientation == 90 || window.orientation == -90) {
+            portraitOrient = false;
+        }
         let timer;
         window.onresize = (e) => {
             clearTimeout(timer);
@@ -14336,9 +14340,6 @@ alert(imgW > imgH);
     });
 
     inputPhoto.addEventListener("change", function () {
-        if (window.orientation == 90 || window.orientation == -90) {
-            portraitOrient = false;
-        }
         modalInst.show();
     });
 
