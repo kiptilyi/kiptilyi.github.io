@@ -1,6 +1,7 @@
 function liveDrawing(inputId) {
     'use sctrict'
     const input = document.getElementById(`${inputId}`);
+    // const modal = document.getElementById("drawing-app");
     const modal = document.createElement("div");
     modal.innerHTML = `<div class="modal-dialog modal-full" role="document"><div class="modal-content"><div class="modal-header"><a id="downloadlink" download="test">Download</a><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"></div></div></div>`;
     const modalInst = new Modal(modal);
@@ -10,7 +11,7 @@ function liveDrawing(inputId) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const clickDrag = new Array();
-    let imgFullSize;
+    let imgHD;
     let imgDraw;
     let clickX = new Array();
     let clickY = new Array();
@@ -29,18 +30,19 @@ function liveDrawing(inputId) {
     ////
 
     input.addEventListener("change", function () {
-        uploadPhoto(input).then(src => createImgs(src), bad => alert(bad));
-        modalInst.show();
+        uploadPhoto(input).then(src => createImgs(src).then(() => modalInst.show()), bad => alert(bad));
     });
 
     $(modal).on("shown.bs.modal", function (e) {
-        resizeCanvas(imgFullSize, canvas);
+        resizeCanvas(imgHD, canvas);
 
         redraw();
+
         mBody.appendChild(canvas);
 
         document.getElementById("downloadlink").addEventListener("touchstart", function (e) {
-            convertToFullSize(canvas, ctx, imgDraw, canvasFullSize, ctxFullSize, imgFullSize).then((a) => {
+            convertToFullSize(canvas, ctx, imgDraw, canvasFullSize, ctxFullSize, imgHD).then((a) => {
+                console.log(a);
                 e.target.setAttribute("href", a);
             });
         });
@@ -50,30 +52,23 @@ function liveDrawing(inputId) {
     window.onresize = () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            resizeCanvas(imgFullSize, canvas);
+            resizeCanvas(imgHD, canvas);
             redraw();
         }, 50);
     }
 
-    function convertToFullSize(canvasDraw, ctxDraw, ImgDraw, canvasFullSize, ctxFullSize, imgFullSize) {
+    function convertToFullSize(canvasDraw, ctxDraw, ImgDraw, canvasFullSize, ctxFullSize, imgHD) {
 
-
-        for (let i = 0; i < arguments.length; i++) {
-            console.log(arguments[i]);
-        }
-
-        // console.log(canvasFullSize);
-
-        let promise = new Promise(function (resolve) {
-
+        return new Promise(function (resolve) {
 
             let mainRatio = (canvasFullSize.width * canvasFullSize.height) / (canvasDraw.width * canvasDraw.height);
 
-            canvasFullSize.width = canvas.width / mainRatio;
-            canvasFullSize.height = canvas.height / mainRatio;
+            console.log(mainRatio);
 
-            ctxFullSize.drawImage(imgFullSize, 0, 0, canvasFullSize.width, canvasFullSize.height);
+            canvasFullSize.width = canvasDraw.width * mainRatio;
+            canvasFullSize.height = canvasDraw.height * mainRatio;
 
+            ctxFullSize.drawImage(imgHD, 0, 0, canvasFullSize.width, canvasFullSize.height);
 
 
             let fullSizeClickX = new Array();
@@ -81,7 +76,7 @@ function liveDrawing(inputId) {
 
             ctxFullSize.strokeStyle = ctx.strokeStyle;
             ctxFullSize.lineJoin = ctx.lineJoin;
-            ctxFullSize.lineWidth = ctx.lineWidth / mainRatio;
+            ctxFullSize.lineWidth = ctx.lineWidth * mainRatio;
 
             if (clickX.length && clickY.length) {
                 fullSizeClickX = clickX.map((el) => (el * canvasFullSize.width) / canvasDraw.width);
@@ -92,13 +87,12 @@ function liveDrawing(inputId) {
             imgDraw.height = canvas.height;
 
 
-
-            for(var i=0; i < fullSizeClickX.length; i++) {
+            for (var i = 0; i < fullSizeClickX.length; i++) {
 
                 ctxFullSize.beginPath();
 
-                if(clickDrag[i] && i) ctxFullSize.moveTo(fullSizeClickX[i-1], fullSizeClickY[i-1]);
-                else ctxFullSize.moveTo(fullSizeClickX[i]-1, fullSizeClickY[i]);
+                if (clickDrag[i] && i) ctxFullSize.moveTo(fullSizeClickX[i - 1], fullSizeClickY[i - 1]);
+                else ctxFullSize.moveTo(fullSizeClickX[i] - 1, fullSizeClickY[i]);
 
                 ctxFullSize.lineTo(fullSizeClickX[i], fullSizeClickY[i]);
                 ctxFullSize.closePath();
@@ -111,8 +105,6 @@ function liveDrawing(inputId) {
             // console.log(canvasFullSize.width);
         });
 
-
-        return promise;
     }
 
 
@@ -137,8 +129,8 @@ function liveDrawing(inputId) {
             renderableWidth = mBody.clientWidth;
         }
 
-            canvas.width = renderableWidth;
-            canvas.height = renderableHeight;
+        canvas.width = renderableWidth;
+        canvas.height = renderableHeight;
 
         if (clickX.length && clickY.length) {
             clickX = clickX.map((el) => (el * renderableWidth) / oldCanvasW);
@@ -148,30 +140,66 @@ function liveDrawing(inputId) {
     }
 
     function fixImgRotate(img, data) {
-        if (data.Orientation == 6) {
-            const width = img.width;
-            const height = img.height;
-            const canvas = document.createElement('canvas');
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > 1920) {
+            height = height / (width / 1920);
+            width = 1920;
+        } else if (height > width && height > 1920) {
+            width = width / (height / 1920);
+            height = 1920;
+        }
+
+        canvasFullSize.width = width;
+        canvasFullSize.height = height;
+
+        if ([5, 6, 7, 8].indexOf(data.Orientation) != -1) {
             canvas.width = height;
             canvas.height = width;
-            const ctx = canvas.getContext("2d");
-            ctx.transform(0, 1, -1, 0, height , 0);
-
-            ctx.drawImage(img, 0, 0, width, height);
-
-            const fixedImg = new Image();
-                fixedImg.src = canvas.toDataURL();
-
-            return fixedImg;
         } else {
-            return img;
+            canvas.width = width;
+            canvas.height = height;
         }
+
+        switch (data.Orientation) {
+            case 2:
+                ctx.transform(-1, 0, 0, 1, width, 0);
+                break;
+            case 3:
+                ctx.transform(-1, 0, 0, -1, width, height);
+                break;
+            case 4:
+                ctx.transform(1, 0, 0, -1, 0, height);
+                break;
+            case 5:
+                ctx.transform(0, 1, 1, 0, 0, 0);
+                break;
+            case 6:
+                ctx.transform(0, 1, -1, 0, height, 0);
+                break;
+            case 7:
+                ctx.transform(0, -1, -1, 0, height, width);
+                break;
+            case 8:
+                ctx.transform(0, -1, 1, 0, 0, width);
+                break;
+            default:
+                return img.src;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        return canvas.toDataURL("image/jpeg");
 
     }
 
     function uploadPhoto(input) {
 
-        let promise = new Promise(function (resolve, reject) {
+        return new Promise(function (resolve, reject) {
             if (input.files && input.files[0]) {
                 let reader = new FileReader();
                 reader.readAsDataURL(input.files[0]);
@@ -183,25 +211,28 @@ function liveDrawing(inputId) {
             }
         });
 
-        return promise;
-
     }
 
     function createImgs(src) {
-        imgFullSize = new Image();
-        imgDraw = new Image();
-        imgFullSize.src = src[0];
-        imgDraw.src = src[0];
-        EXIF.getData(src[1], function() {
-            imgData = EXIF.getAllTags(this)
-            imgFullSize = fixImgRotate(imgFullSize, imgData);
-            imgDraw = fixImgRotate(imgDraw, imgData);
+        return new Promise(function (resolve) {
+            imgHD = new Image();
+            imgDraw = new Image();
+            imgHD.src = src[0];
+                EXIF.getData(src[1], function() {
+                    imgData = EXIF.getAllTags(this);
+                    imgHD.src = fixImgRotate(imgHD, imgData);
+                    imgHD.onload = e => {
+                        imgDraw = imgHD;
+                        resolve();
+                    }
+                });
+
         });
     }
 
     ////
 
-    canvas.addEventListener("touchstart", function(e) {
+    canvas.addEventListener("touchstart", function (e) {
         let mouseX = e.touches[0].pageX - this.offsetLeft;
         let mouseY = e.touches[0].pageY - this.offsetTop;
 
@@ -210,7 +241,7 @@ function liveDrawing(inputId) {
         redraw();
     });
 
-    canvas.addEventListener("touchmove", function(e){
+    canvas.addEventListener("touchmove", function (e) {
         if (paint) {
             addClick(e.touches[0].pageX - this.offsetLeft, e.touches[0].pageY - this.offsetTop, true);
             redraw();
@@ -238,12 +269,12 @@ function liveDrawing(inputId) {
         ctx.lineJoin = "round";
         ctx.lineWidth = 5;
 
-        for(var i=0; i < clickX.length; i++) {
+        for (var i = 0; i < clickX.length; i++) {
 
             ctx.beginPath();
 
-            if(clickDrag[i] && i) ctx.moveTo(clickX[i-1], clickY[i-1]);
-                else ctx.moveTo(clickX[i]-1, clickY[i]);
+            if (clickDrag[i] && i) ctx.moveTo(clickX[i - 1], clickY[i - 1]);
+            else ctx.moveTo(clickX[i] - 1, clickY[i]);
 
             ctx.lineTo(clickX[i], clickY[i]);
             ctx.closePath();
