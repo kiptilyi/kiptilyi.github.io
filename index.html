@@ -14,18 +14,73 @@
 	<label for="takePhoto" class="btn btn-danger">TakePhoto</label>
 	<input id="takePhoto">
 </div>
-<!--<div class="modal fade" id="drawing-app" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"-->
-	 <!--aria-hidden="true">-->
-	<!--<div class="modal-dialog modal-full" role="document">-->
-		<!--<div class="modal-content">-->
-			<!--<div class="modal-header"><a id="downloadlink" download="test">Download</a>-->
-				<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-				<!--</button>-->
-			<!--</div>-->
-			<!--<div class="modal-body"></div>-->
-		<!--</div>-->
-	<!--</div>-->
-<!--</div>-->
+<div class="modal fade" id="drawing-app" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog modal-full" role="document">
+		<div class="modal-content">
+			<div class="modal-header"><a id="downloadlink" download="test">Download</a>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="da-toolbar">
+					<div class="toolbar-inner">
+						<div class="tool tool-color">
+							<label class="tc-white">
+								<input value="#ffffff" type="radio" name="color" checked>
+								<span class="color-indicator"></span>
+							</label>
+							<label class="tc-black">
+								<input value="#000000" type="radio" name="color">
+								<span class="color-indicator"></span>
+							</label>
+							<label class="tc-red">
+								<input value="#ff0000" type="radio" name="color">
+								<span class="color-indicator"></span>
+							</label>
+							<label class="tc-green">
+								<input value="#00ff00" type="radio" name="color">
+								<span class="color-indicator"></span>
+							</label>
+							<label class="tc-blue">
+								<input value="#0000ff" type="radio" name="color">
+								<span class="color-indicator"></span>
+							</label>
+						</div>
+						<div class="tool tool-line_width">
+							<label class="tlw-10">
+								<input value="10" type="radio" name="lineWidth">
+								<span class="width-indicator"></span>
+							</label>
+							<label class="tlw-7">
+								<input value="7" type="radio" name="lineWidth">
+								<span class="width-indicator"></span>
+							</label>
+							<label class="tlw-5">
+								<input value="5" type="radio" name="lineWidth" checked>
+								<span class="width-indicator"></span>
+							</label>
+							<label class="tlw-3">
+								<input value="3" type="radio" name="lineWidth">
+								<span class="width-indicator"></span>
+							</label>
+							<label class="tlw-1">
+								<input value="1" type="radio" name="lineWidth">
+								<span class="width-indicator"></span>
+							</label>
+						</div>
+						<div class="tool tool-line">
+							<label>
+								<input class="tool-control" id="line" type="checkbox">
+								<span class="tool-indicator"><span class="line"></span></span>
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 </body>
 <script src="js/main.min.js"></script>
 <script src="js/script.js"></script>
