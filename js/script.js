@@ -14,6 +14,7 @@ function liveDrawing(inputId) {
     const clickDrag = new Array();
     const colors = new Array();
     const lineWidth = new Array();
+    const lineModeInput = document.getElementById("da-line");
     let curColor = "#ffffff";
     let curLineWidth = 5;
     let imgHD;
@@ -21,6 +22,7 @@ function liveDrawing(inputId) {
     let clickX = new Array();
     let clickY = new Array();
     let timer;
+    let switcher;
     let imgData;
     ////
     modal.classList.add("modal", "fade");
@@ -198,11 +200,36 @@ function liveDrawing(inputId) {
     }
 
     function addClick(x, y, dragging) {
-        clickX.push(x);
-        clickY.push(y);
-        clickDrag.push(dragging);
-        colors.push(curColor);
-        lineWidth.push(curLineWidth);
+
+        const callerName = arguments.callee.caller.name;
+
+        if (lineModeInput.checked) {
+            if (callerName == "touchStart") {
+                clickX.push(x);
+                clickY.push(y);
+                switcher = true;
+                addData();
+            } else if (callerName == "touchMove") {
+                if (switcher) {
+                    clickX.push(x);
+                    clickY.push(y);
+                    switcher = false;
+                    addData();
+                }
+                clickX[clickX.length - 1] = x;
+                clickY[clickY.length - 1] = y;
+            }
+        } else {
+            clickX.push(x);
+            clickY.push(y);
+            addData();
+        }
+
+        function addData() {
+            clickDrag.push(dragging);
+            colors.push(curColor);
+            lineWidth.push(curLineWidth);
+        }
     }
 
     function redraw() {
@@ -214,7 +241,7 @@ function liveDrawing(inputId) {
 
         ctx.lineJoin = "round";
 
-        for (var i = 0; i < clickX.length; i++) {
+        for (let i = 0; i < clickX.length; i++) {
 
             ctx.beginPath();
 
@@ -263,10 +290,7 @@ function liveDrawing(inputId) {
         if (target.name == "lineWidth") curLineWidth = target.value;
     });
 
-    canvas.addEventListener("touchstart", function (e) {
-
-        let mouseX = e.touches[0].pageX - this.offsetLeft;
-        let mouseY = e.touches[0].pageY - this.offsetTop;
+    canvas.addEventListener("touchstart", function touchStart(e) {
 
         paint = true;
 
@@ -276,7 +300,7 @@ function liveDrawing(inputId) {
 
     });
 
-    canvas.addEventListener("touchmove", function (e) {
+    canvas.addEventListener("touchmove", function touchMove(e) {
 
         if (paint) {
             addClick(e.touches[0].pageX - this.offsetLeft, e.touches[0].pageY - this.offsetTop, true);
@@ -285,9 +309,9 @@ function liveDrawing(inputId) {
 
     });
 
-    canvas.addEventListener("touchend", () => paint = false);
+    canvas.addEventListener("touchend", () => {paint = false});
 
-    canvas.addEventListener("touchleave", () => paint = false);
+    canvas.addEventListener("touchleave", () => {paint = false});
 
 }
 
