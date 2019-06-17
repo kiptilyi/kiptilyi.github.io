@@ -1616,11 +1616,21 @@ a.close.disabled {
     height: 100%;
     background: rgba(0, 0, 0, 0.2); }
   .modal-full .modal-header {
-    padding: 5px 15px;
+    padding: 2.5px;
+    height: 30px;
+    width: 30px;
     position: absolute;
     top: 0;
     z-index: 2;
-    background: rgba(255, 255, 255, 0.5); }
+    border-radius: 0;
+    border-bottom-right-radius: 7px;
+    background: #d6d6d6;
+    box-shadow: 5px 5px 15px -9px rgba(0, 0, 0, 0.75); }
+    .modal-full .modal-header .close {
+      padding: 0;
+      margin: 0;
+      height: 25px;
+      width: 25px; }
 
 .modal {
   height: 100%; }
@@ -1733,6 +1743,9 @@ a.close.disabled {
       width: 6px;
       height: 6px;
       background: #e9416d; }
+    #da-toolbar .toolbar-inner .tool-complete img {
+      height: 15px;
+      width: 15px; }
 
 @media (orientation: landscape) {
   #da-toolbar {

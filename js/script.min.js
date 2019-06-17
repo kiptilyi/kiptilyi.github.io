@@ -187,14 +187,14 @@ function liveDrawing(inputId) {
             imgHD = new Image();
             imgDraw = new Image();
             imgHD.src = src[0];
-                EXIF.getData(src[1], function() {
-                    imgData = EXIF.getAllTags(this);
-                    imgHD.src = fixImgRotate(imgHD, imgData);
-                    imgHD.onload = () => {
-                        imgDraw = imgHD;
-                        resolve();
-                    }
-                });
+            EXIF.getData(src[1], function () {
+                imgData = EXIF.getAllTags(this);
+                imgHD.src = fixImgRotate(imgHD, imgData);
+                imgHD.onload = () => {
+                    imgDraw = imgHD;
+                    resolve();
+                }
+            });
         });
 
     }
@@ -258,9 +258,20 @@ function liveDrawing(inputId) {
 
     }
 
+    function dataReset() {
+        imgHD = new Image();
+        imgDraw = new Image();
+        clickX = new Array();
+        clickY = new Array();
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     // EVENTS
 
-    input.addEventListener("change", () => {uploadPhoto(input).then(src => createImages(src).then(() => modalInst.show()), bad => alert(bad))});
+    input.addEventListener("change", () => {
+        dataReset();
+        uploadPhoto(input).then(src => createImages(src).then(() => modalInst.show()), bad => alert(bad))
+    });
 
     window.onresize = () => {
         clearTimeout(timer);
@@ -279,7 +290,9 @@ function liveDrawing(inputId) {
         mBody.appendChild(canvas);
 
         document.getElementById("downloadlink").addEventListener("touchstart", e => {
-            convertToFullSize(canvas, ctx, imgDraw, canvasFullSize, ctxFullSize, imgHD).then(a => {e.target.setAttribute("href", a)});
+            convertToFullSize(canvas, ctx, imgDraw, canvasFullSize, ctxFullSize, imgHD).then(a => {
+                e.target.setAttribute("href", a)
+            });
         });
 
     });
@@ -309,9 +322,9 @@ function liveDrawing(inputId) {
 
     });
 
-    canvas.addEventListener("touchend", () => {paint = false});
+    canvas.addEventListener("touchend", () => paint = false);
 
-    canvas.addEventListener("touchleave", () => {paint = false});
+    canvas.addEventListener("touchleave", () => paint = false);
 
 }
 
