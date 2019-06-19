@@ -1743,9 +1743,15 @@ a.close.disabled {
       width: 6px;
       height: 6px;
       background: #e9416d; }
-    #da-toolbar .toolbar-inner .tool-complete img {
-      height: 15px;
-      width: 15px; }
+    #da-toolbar .toolbar-inner .tool-complete svg {
+      width: 20px;
+      height: auto; }
+    #da-toolbar .toolbar-inner .tool-clean button {
+      padding: 0;
+      margin: 0; }
+    #da-toolbar .toolbar-inner .tool-clean svg {
+      width: 20px;
+      height: auto; }
 
 @media (orientation: landscape) {
   #da-toolbar {
