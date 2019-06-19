@@ -1747,6 +1747,8 @@ a.close.disabled {
       width: 20px;
       height: auto; }
     #da-toolbar .toolbar-inner .tool-clean button {
+      background: unset;
+      border: none;
       padding: 0;
       margin: 0; }
     #da-toolbar .toolbar-inner .tool-clean svg {

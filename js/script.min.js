@@ -277,7 +277,14 @@ function liveDrawing(inputId) {
 
     }
 
-    function softReset() {
+    function softReset(all) {
+        if (all != undefined) {
+            fullX.length = 0;
+            fullY.length = 0;
+            fullColors.length = 0;
+            fullLineWidth.length = 0;
+            fullClickDrag.length = 0;
+        }
         clickX.length = 0;
         clickY.length = 0;
         colors.length = 0;
@@ -318,7 +325,7 @@ function liveDrawing(inputId) {
                     if (target.name == "lineWidth") curLineWidth = target.value;
                 });
 
-                document.getElementById("da-clean").addEventListener("click", () => {softReset(); ctx.drawImage(imgDraw, 0, 0, ctx.canvas.width, ctx.canvas.height)});
+                document.getElementById("da-clean").addEventListener("click", () => {softReset(true); ctx.drawImage(imgDraw, 0, 0, ctx.canvas.width, ctx.canvas.height)});
 
                 document.getElementById("da-accept").addEventListener("click", () => {
                     // console.log("test");
